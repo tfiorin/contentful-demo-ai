@@ -27,8 +27,8 @@ export default function ProductDetailPage() {
         setLoading(true);
         setError(null);
         
-        // Fetch product from Contentful with locale
-        const productResponse = await fetch(`/api/products/${params.id}?locale=${locale}`);
+        // Fetch product from Contentful with locale using slug
+        const productResponse = await fetch(`/api/products/${params.slug}?locale=${locale}`);
         if (!productResponse.ok) {
           throw new Error('Product not found');
         }
@@ -57,10 +57,10 @@ export default function ProductDetailPage() {
       }
     }
 
-    if (params.id) {
+    if (params.slug) {
       loadProduct();
     }
-  }, [params.id, locale]);
+  }, [params.slug, locale]);
 
   const handleAddToCart = async () => {
     if (!inventory?.variantId) {
