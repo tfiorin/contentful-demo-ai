@@ -199,7 +199,7 @@ export default function ProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
-          <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
+          <div className="relative w-full bg-muted rounded-lg overflow-hidden" style={{ aspectRatio: '1/1' }}>
             {imageUrl ? (
               <Image
                 src={`https:${imageUrl}`}
