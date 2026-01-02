@@ -6,11 +6,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart, Package, Minus, Plus, Check, AlertCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addToCart, checkout } = useCart();
+  const { locale, t } = useLanguage();
   
   const [product, setProduct] = useState(null);
   const [inventory, setInventory] = useState(null);
@@ -26,8 +28,8 @@ export default function ProductDetailPage() {
         setLoading(true);
         setError(null);
         
-        // Fetch product from Contentful
-        const productResponse = await fetch(`/api/products/${params.id}`);
+        // Fetch product from Contentful with locale
+        const productResponse = await fetch(`/api/products/${params.id}?locale=${locale}`);
         if (!productResponse.ok) {
           throw new Error('Product not found');
         }
@@ -59,7 +61,7 @@ export default function ProductDetailPage() {
     if (params.id) {
       loadProduct();
     }
-  }, [params.id]);
+  }, [params.id, locale]);
 
   const handleAddToCart = async () => {
     if (!inventory?.variantId) {
@@ -137,14 +139,14 @@ export default function ProductDetailPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('productNotFound')}</h2>
             <p className="text-muted-foreground mb-6">{error}</p>
             <Link
               href="/"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Products
+              {t('backToProducts')}
             </Link>
           </div>
         </div>
@@ -154,7 +156,7 @@ export default function ProductDetailPage() {
 
   const imageUrl = product?.fields.featuredProductImage?.fields?.file?.url;
   const productName = product?.fields.name || 'Product';
-  const productDescription = product?.fields.description || 'No description available';
+  const productDescription = product?.fields.description || t('noDescription');
   const productPrice = product?.fields.price;
   const sku = product?.fields.sku;
   const quantityAvailable = inventory?.quantityAvailable || 0;
@@ -178,7 +180,7 @@ export default function ProductDetailPage() {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Products
+          {t('backToProducts')}
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -225,25 +227,25 @@ export default function ProductDetailPage() {
                   {availableForSale ? (
                     <>
                       <Check className="w-5 h-5 text-green-600" />
-                      <span className="font-semibold text-green-600">In Stock</span>
+                      <span className="font-semibold text-green-600">{t('inStock')}</span>
                     </>
                   ) : (
                     <>
                       <AlertCircle className="w-5 h-5 text-destructive" />
-                      <span className="font-semibold text-destructive">Out of Stock</span>
+                      <span className="font-semibold text-destructive">{t('outOfStock')}</span>
                     </>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {quantityAvailable > 0 
-                    ? `${quantityAvailable} ${quantityAvailable === 1 ? 'unit' : 'units'} available` 
-                    : 'Currently unavailable'}
+                    ? `${quantityAvailable} ${quantityAvailable === 1 ? t('unitAvailable') : t('unitsAvailable')}` 
+                    : t('currentlyUnavailable')}
                 </p>
               </div>
 
               {/* Description */}
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-3">Description</h2>
+                <h2 className="text-xl font-semibold mb-3">{t('description')}</h2>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                   {productDescription}
                 </p>
@@ -252,7 +254,7 @@ export default function ProductDetailPage() {
               {/* Quantity Selector */}
               {availableForSale && (
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold mb-2">Quantity</label>
+                  <label className="block text-sm font-semibold mb-2">{t('quantity')}</label>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -285,7 +287,7 @@ export default function ProductDetailPage() {
                 <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-700 flex items-center gap-2">
                     <Check className="w-4 h-4" />
-                    Added to cart successfully!
+                    {t('addedSuccess')}
                   </p>
                 </div>
               )}
@@ -298,14 +300,14 @@ export default function ProductDetailPage() {
                   className="flex-1 px-6 py-3 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  {adding ? 'Adding...' : 'Add to Cart'}
+                  {adding ? t('adding') : t('addToCart')}
                 </button>
                 <button
                   onClick={handleBuyNow}
                   disabled={!availableForSale || adding}
                   className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {adding ? 'Processing...' : 'Buy Now'}
+                  {adding ? t('processing') : t('buyNow')}
                 </button>
               </div>
             </div>
@@ -319,10 +321,10 @@ export default function ProductDetailPage() {
           <div className="text-center text-muted-foreground">
             <p className="mb-2 font-semibold text-foreground">PayCo</p>
             <p className="text-sm">
-              Advanced, technology-based commerce solutions for all types of businesses
+              {t('footerTagline')}
             </p>
             <p className="text-sm mt-4">
-              © {new Date().getFullYear()} PayCo. All rights reserved.
+              © {new Date().getFullYear()} PayCo. {t('allRightsReserved')}
             </p>
           </div>
         </div>
