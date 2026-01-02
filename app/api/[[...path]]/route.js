@@ -6,6 +6,8 @@ import { CREATE_CART, ADD_TO_CART } from '@/lib/shopify/mutations';
 
 export async function GET(request) {
   const pathname = new URL(request.url).pathname;
+  const searchParams = new URL(request.url).searchParams;
+  const locale = searchParams.get('locale') || 'en';
   const segments = pathname.split('/').filter(Boolean);
 
   // Remove 'api' from segments
@@ -17,14 +19,14 @@ export async function GET(request) {
   try {
     // GET /api/products - Fetch all products from Contentful
     if (segments[0] === 'products' && segments.length === 1) {
-      const products = await fetchProducts();
+      const products = await fetchProducts(locale);
       return NextResponse.json({ products });
     }
 
     // GET /api/products/:id - Fetch single product from Contentful
     if (segments[0] === 'products' && segments.length === 2) {
       const productId = segments[1];
-      const product = await fetchProductById(productId);
+      const product = await fetchProductById(productId, locale);
       
       if (!product) {
         return NextResponse.json(
