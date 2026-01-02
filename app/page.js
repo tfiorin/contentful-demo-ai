@@ -98,9 +98,6 @@ function HomeContent({ isPreview }) {
             <Link href="#" className="text-sm font-medium hover:text-primary">
               {t('about')}
             </Link>
-            <Link href="#" className="text-sm font-medium hover:text-primary">
-              {t('contact')}
-            </Link>
             <LanguageSwitcher />
 
             <button className="relative p-2 hover:bg-muted rounded-lg">
