@@ -153,8 +153,8 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product) => {
-                const imageUrl = product.fields.image?.fields?.file?.url;
-                const productName = product.fields.name || product.fields.productName || product.fields.title || 'Product';
+                const imageUrl = product.fields.featuredProductImage?.fields?.file?.url;
+                const productName = product.fields.name || 'Product';
                 const productPrice = product.fields.price || 'N/A';
                 
                 return (
