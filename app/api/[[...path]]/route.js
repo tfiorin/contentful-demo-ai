@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchProducts, fetchProductBySlug } from '@/lib/contentful';
+import { fetchProducts, fetchProductBySlug, fetchLandingPage } from '@/lib/contentful';
 import { getShopifyClient } from '@/lib/shopify';
 import { QUERY_PRODUCT_BY_SKU } from '@/lib/shopify/queries';
 import { CREATE_CART, ADD_TO_CART } from '@/lib/shopify/mutations';
@@ -17,6 +17,12 @@ export async function GET(request) {
   }
 
   try {
+    // GET /api/landing - Fetch landing page from Contentful
+    if (segments[0] === 'landing' && segments.length === 1) {
+      const landingPage = await fetchLandingPage(locale);
+      return NextResponse.json({ landingPage });
+    }
+
     // GET /api/products - Fetch all products from Contentful
     if (segments[0] === 'products' && segments.length === 1) {
       const products = await fetchProducts(locale);
