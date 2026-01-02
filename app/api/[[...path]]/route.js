@@ -4,6 +4,32 @@ import { getShopifyClient } from '@/lib/shopify';
 import { QUERY_PRODUCT_BY_SKU } from '@/lib/shopify/queries';
 import { CREATE_CART, ADD_TO_CART } from '@/lib/shopify/mutations';
 
+// Decode the base64 GID to extract ID and type
+function extractShopifyId(gid) {
+  try {
+    // Decode base64
+    const decoded = atob(gid);
+    console.log('Decoded GID:', decoded);
+    
+    // Extract the numeric ID from either Product or ProductVariant
+    // Examples: "gid://shopify/Product/7567636889713" or "gid://shopify/ProductVariant/42929749852273"
+    const match = decoded.match(/\/(Product(?:Variant)?)\/(\d+)/);
+    
+    if (match) {
+      return {
+        type: match[1], // "Product" or "ProductVariant"
+        id: match[2],   // The numeric ID
+        fullGid: decoded // The full decoded GID
+      };
+    }
+    
+    return null;
+  } catch (err) {
+    console.error('Error decoding Shopify GID:', err);
+    return null;
+  }
+}
+
 export async function GET(request) {
   const pathname = new URL(request.url).pathname;
   const searchParams = new URL(request.url).searchParams;
@@ -44,33 +70,72 @@ export async function GET(request) {
       return NextResponse.json({ product });
     }
 
-    // GET /api/shopify/inventory/:sku - Fetch inventory from Shopify by SKU
+    // GET /api/shopify/inventory/:sku - Fetch inventory from Shopify by SKU/GID
     if (segments[0] === 'shopify' && segments[1] === 'inventory' && segments.length === 3) {
       const sku = segments[2];
       const client = getShopifyClient();
       
-      const data = await client.request(QUERY_PRODUCT_BY_SKU, {
-        query: `sku:${sku}`,
-      });
-      
-      if (!data.products.edges.length) {
+      console.log(`Fetching Shopify inventory for SKU: ${sku}`);
+      const decoded = extractShopifyId(sku);
+      console.log(`Decoded Shopify data:`, decoded);
+
+      if (!decoded) {
         return NextResponse.json(
-          { error: 'Product not found in Shopify', quantityAvailable: 0, availableForSale: false },
-          { status: 404 }
+          { error: 'Invalid SKU format', quantityAvailable: 0, availableForSale: false },
+          { status: 400 }
         );
       }
-      
-      const product = data.products.edges[0].node;
-      const variant = product.variants.edges[0]?.node;
-      
-      return NextResponse.json({
-        productId: product.id,
-        variantId: variant?.id,
-        sku: variant?.sku,
-        quantityAvailable: variant?.quantityAvailable || 0,
-        availableForSale: variant?.availableForSale || false,
-        price: variant?.price,
-      });
+
+      // If it's a ProductVariant GID, we can query by the variant ID directly
+      if (decoded.type === 'ProductVariant') {
+        // Query using the variant's SKU
+        const data = await client.request(QUERY_PRODUCT_BY_SKU, {
+          query: `sku:${decoded.id}`,
+        });
+        
+        if (!data.products.edges.length) {
+          return NextResponse.json(
+            { error: 'Product not found in Shopify', quantityAvailable: 0, availableForSale: false },
+            { status: 404 }
+          );
+        }
+        
+        const product = data.products.edges[0].node;
+        const variant = product.variants.edges[0]?.node;
+        
+        return NextResponse.json({
+          productId: product.id,
+          variantId: variant?.id,
+          sku: variant?.sku,
+          quantityAvailable: variant?.quantityAvailable || 0,
+          availableForSale: variant?.availableForSale || false,
+          price: variant?.price,
+        });
+      } else {
+        // If it's a Product GID, query by product ID
+        const data = await client.request(QUERY_PRODUCT_BY_SKU, {
+          query: `sku:${decoded.id}`,
+        });
+        
+        if (!data.products.edges.length) {
+          return NextResponse.json(
+            { error: 'Product not found in Shopify', quantityAvailable: 0, availableForSale: false },
+            { status: 404 }
+          );
+        }
+        
+        const product = data.products.edges[0].node;
+        const variant = product.variants.edges[0]?.node;
+        
+        return NextResponse.json({
+          productId: product.id,
+          variantId: variant?.id,
+          sku: variant?.sku,
+          quantityAvailable: variant?.quantityAvailable || 0,
+          availableForSale: variant?.availableForSale || false,
+          price: variant?.price,
+        });
+      }
     }
 
     return NextResponse.json(

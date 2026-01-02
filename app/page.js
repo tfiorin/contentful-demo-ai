@@ -46,6 +46,8 @@ export default function Home() {
 
   const itemCount = cart?.lines?.edges?.length || 0;
 
+  landingPage && console.log('Landing Page:', landingPage);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -105,7 +107,7 @@ export default function Home() {
                 backgroundClip: 'text'
               } : {}}
             >
-              {landingPage?.fields?.heroBannerHeadline || t('heroTitle')}
+              {landingPage?.fields?.heroBannerHeadline}
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
               {t('heroDescription')}
@@ -136,27 +138,28 @@ export default function Home() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Zap className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('fastReliable')}</h3>
+
+              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.leftFeature ?.fields?.title}</h3>
               <p className="text-muted-foreground">
-                {t('fastReliableDesc')}
+                {landingPage?.fields?.leftFeature?.fields.description}
               </p>
             </div>
             <div className="text-center p-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('securePayments')}</h3>
+              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.middleFeature ?.fields?.title}</h3>
               <p className="text-muted-foreground">
-                {t('securePaymentsDesc')}
+                {landingPage?.fields?.middleFeature?.fields?.description}
               </p>
             </div>
             <div className="text-center p-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Package className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('qualityHardware')}</h3>
+              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.rightFeature ?.fields?.title}</h3>
               <p className="text-muted-foreground">
-                {t('qualityHardwareDesc')}
+                {landingPage?.fields?.rightFeature ?.fields?.description}
               </p>
             </div>
           </div>

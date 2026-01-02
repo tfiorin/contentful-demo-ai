@@ -35,18 +35,42 @@ export default function ProductDetailPage() {
         const productData = await productResponse.json();
         setProduct(productData.product);
         
+        // Extract SKU - handle both reference and plain text formats
+        let sku = productData.product.fields.sku;
+        
+        // Log the full SKU structure to debug
+        console.log('Raw SKU field:', sku);
+        
+        // If SKU is a reference object, extract the actual SKU value
+        if (sku && typeof sku === 'object') {
+          // Check if it's a Contentful reference with fields
+          if (sku.fields) {
+            // Try common field names for SKU
+            sku = sku.fields.sku || sku.fields.skuCode || sku.fields.code || sku.fields.value;
+          }
+          // If still an object, try to find any string value
+          if (typeof sku === 'object') {
+            console.warn('SKU is still an object after extraction:', sku);
+            sku = null;
+          }
+        }
+        
+        console.log('Extracted SKU:', sku);
+        
         // Fetch inventory from Shopify using SKU
-        const sku = productData.product.fields.sku;
         if (sku) {
           try {
+            console.log('Fetching inventory for SKU:', sku);
             const inventoryResponse = await fetch(`/api/shopify/inventory/${sku}`);
             const inventoryData = await inventoryResponse.json();
+            console.log('Inventory data received:', inventoryData);
             setInventory(inventoryData);
           } catch (err) {
             console.error('Error loading inventory:', err);
             setInventory({ quantityAvailable: 0, availableForSale: false });
           }
         } else {
+          console.warn('No valid SKU found for product');
           setInventory({ quantityAvailable: 0, availableForSale: false });
         }
       } catch (err) {
@@ -57,6 +81,7 @@ export default function ProductDetailPage() {
       }
     }
 
+    console.log('Loading product for slug:', params.slug);
     if (params.slug) {
       loadProduct();
     }
@@ -153,11 +178,16 @@ export default function ProductDetailPage() {
     );
   }
 
+  // Extract SKU for display - handle both reference and plain text
+  let displaySku = product?.fields.sku;
+  if (displaySku && typeof displaySku === 'object' && displaySku.fields) {
+    displaySku = displaySku.fields.sku || displaySku.fields.skuCode || displaySku.fields.code || displaySku.fields.value || 'N/A';
+  }
+
   const imageUrl = product?.fields.featuredProductImage?.fields?.file?.url;
   const productName = product?.fields.name || 'Product';
   const productDescription = product?.fields.description || t('noDescription');
   const productPrice = product?.fields.price;
-  const sku = product?.fields.sku;
   const quantityAvailable = inventory?.quantityAvailable || 0;
   const availableForSale = inventory?.availableForSale && quantityAvailable > 0;
 
@@ -214,9 +244,9 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {sku && (
+              {displaySku && (
                 <div className="mb-4">
-                  <p className="text-sm text-muted-foreground">SKU: {sku}</p>
+                  <p className="text-sm text-muted-foreground">SKU: {displaySku}</p>
                 </div>
               )}
 
