@@ -152,8 +152,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const imageUrl = product?.fields.image?.fields?.file?.url;
-  const productName = product?.fields.name || product?.fields.productName || product?.fields.title || 'Product';
+  const imageUrl = product?.fields.featuredProductImage?.fields?.file?.url;
+  const productName = product?.fields.name || 'Product';
   const productDescription = product?.fields.description || 'No description available';
   const productPrice = product?.fields.price;
   const sku = product?.fields.sku;
