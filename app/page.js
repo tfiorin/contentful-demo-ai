@@ -160,11 +160,12 @@ export default function Home() {
                 const imageUrl = product.fields.featuredProductImage?.fields?.file?.url;
                 const productName = product.fields.name || 'Product';
                 const productPrice = product.fields.price || 'N/A';
+                const productSlug = product.fields.slug || product.sys.id;
                 
                 return (
                   <Link
                     key={product.sys.id}
-                    href={`/product/${product.sys.id}`}
+                    href={`/product/${productSlug}`}
                     className="group border border-border rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-card"
                   >
                     <div className="relative w-full bg-muted overflow-hidden" style={{ height: '192px' }}>
