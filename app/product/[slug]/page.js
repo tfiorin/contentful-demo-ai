@@ -38,9 +38,6 @@ export default function ProductDetailPage() {
         // Extract SKU - handle both reference and plain text formats
         let sku = productData.product.fields.sku;
         
-        // Log the full SKU structure to debug
-        console.log('Raw SKU field:', sku);
-        
         // If SKU is a reference object, extract the actual SKU value
         if (sku && typeof sku === 'object') {
           // Check if it's a Contentful reference with fields
@@ -55,15 +52,11 @@ export default function ProductDetailPage() {
           }
         }
         
-        console.log('Extracted SKU:', sku);
-        
         // Fetch inventory from Shopify using SKU
         if (sku) {
           try {
-            console.log('Fetching inventory for SKU:', sku);
             const inventoryResponse = await fetch(`/api/shopify/inventory/${sku}`);
             const inventoryData = await inventoryResponse.json();
-            console.log('Inventory data received:', inventoryData);
             setInventory(inventoryData);
           } catch (err) {
             console.error('Error loading inventory:', err);
@@ -81,7 +74,6 @@ export default function ProductDetailPage() {
       }
     }
 
-    console.log('Loading product for slug:', params.slug);
     if (params.slug) {
       loadProduct();
     }
