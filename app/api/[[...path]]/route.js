@@ -32,6 +32,7 @@ export async function GET(request) {
   const pathname = new URL(request.url).pathname;
   const searchParams = new URL(request.url).searchParams;
   const locale = searchParams.get('locale') || 'en';
+  const preview = searchParams.get('preview') === '1';
   const segments = pathname.split('/').filter(Boolean);
 
   // Remove 'api' from segments
@@ -41,22 +42,24 @@ export async function GET(request) {
   }
 
   try {
+    console.log(`API Request - Path: ${pathname}, Segments: ${segments.join('/')}, Locale: ${locale}, Preview: ${preview}`);
+
     // GET /api/landing - Fetch landing page from Contentful
     if (segments[0] === 'landing' && segments.length === 1) {
-      const landingPage = await fetchLandingPage(locale);
+      const landingPage = await fetchLandingPage(locale, preview);
       return NextResponse.json({ landingPage });
     }
 
     // GET /api/products - Fetch all products from Contentful
     if (segments[0] === 'products' && segments.length === 1) {
-      const products = await fetchProducts(locale);
+      const products = await fetchProducts(locale, preview);
       return NextResponse.json({ products });
     }
 
     // GET /api/products/:slug - Fetch single product by slug from Contentful
     if (segments[0] === 'products' && segments.length === 2) {
       const slug = segments[1];
-      const product = await fetchProductBySlug(slug, locale);
+      const product = await fetchProductBySlug(slug, locale, preview);
       
       if (!product) {
         return NextResponse.json(

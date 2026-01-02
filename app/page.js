@@ -1,25 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Package, Shield, Zap } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { ContentfulLivePreviewProvider } from '@contentful/live-preview/react';
 
-export default function Home() {
+function HomeContent() {
   const [products, setProducts] = useState([]);
   const [landingPage, setLandingPage] = useState(null);
   const [loading, setLoading] = useState(true);
   const { cart } = useCart();
   const { locale, t } = useLanguage();
+  const searchParams = useSearchParams();
+  const isPreview = searchParams.get('preview') === '1';
 
   useEffect(() => {
     async function loadProducts() {
       try {
         setLoading(true);
-        const response = await fetch(`/api/products?locale=${locale}`);
+        const response = await fetch(`/api/products?locale=${locale}&preview=${isPreview ? '1' : '0'}`);
         const data = await response.json();
         setProducts(data.products || []);
       } catch (error) {
@@ -29,12 +33,12 @@ export default function Home() {
       }
     }
     loadProducts();
-  }, [locale]);
+  }, [locale, isPreview]);
 
   useEffect(() => {
     async function loadLandingPage() {
       try {
-        const response = await fetch(`/api/landing?locale=${locale}`);
+        const response = await fetch(`/api/landing?locale=${locale}&preview=${isPreview ? '1' : '0'}`);
         const data = await response.json();
         setLandingPage(data.landingPage);
       } catch (error) {
@@ -42,13 +46,16 @@ export default function Home() {
       }
     }
     loadLandingPage();
-  }, [locale]);
+  }, [locale, isPreview]);
 
   const itemCount = cart?.lines?.edges?.length || 0;
 
-  landingPage && console.log('Landing Page:', landingPage);
-
   return (
+    <ContentfulLivePreviewProvider
+      locale="en-US"
+      enableInspectorMode={isPreview}
+      enableLiveUpdates={isPreview}
+    >
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b bg-card">
@@ -138,8 +145,7 @@ export default function Home() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Zap className="w-8 h-8 text-primary" />
               </div>
-
-              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.leftFeature ?.fields?.title}</h3>
+              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.leftFeature?.fields?.title}</h3>
               <p className="text-muted-foreground">
                 {landingPage?.fields?.leftFeature?.fields.description}
               </p>
@@ -148,7 +154,7 @@ export default function Home() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.middleFeature ?.fields?.title}</h3>
+              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.middleFeature?.fields?.title}</h3>
               <p className="text-muted-foreground">
                 {landingPage?.fields?.middleFeature?.fields?.description}
               </p>
@@ -157,9 +163,9 @@ export default function Home() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Package className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.rightFeature ?.fields?.title}</h3>
+              <h3 className="text-xl font-semibold mb-2">{landingPage?.fields?.rightFeature?.fields?.title}</h3>
               <p className="text-muted-foreground">
-                {landingPage?.fields?.rightFeature ?.fields?.description}
+                {landingPage?.fields?.rightFeature?.fields?.description}
               </p>
             </div>
           </div>
@@ -254,5 +260,21 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </ContentfulLivePreviewProvider>
+  );
+}
+
+export default function Home() {
+  const searchParams = useSearchParams();
+  const isPreview = searchParams.get('preview') === '1';
+
+  return (
+    <ContentfulLivePreviewProvider
+      locale="en-US"
+      enableInspectorMode={isPreview}
+      enableLiveUpdates={isPreview}
+    >
+      <HomeContent />
+    </ContentfulLivePreviewProvider>
   );
 }
