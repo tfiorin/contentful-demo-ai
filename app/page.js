@@ -5,16 +5,20 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Package, Shield, Zap } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { cart } = useCart();
+  const { locale, t } = useLanguage();
 
   useEffect(() => {
     async function loadProducts() {
       try {
-        const response = await fetch('/api/products');
+        setLoading(true);
+        const response = await fetch(`/api/products?locale=${locale}`);
         const data = await response.json();
         setProducts(data.products || []);
       } catch (error) {
@@ -24,7 +28,7 @@ export default function Home() {
       }
     }
     loadProducts();
-  }, []);
+  }, [locale]);
 
   const itemCount = cart?.lines?.edges?.length || 0;
 
@@ -39,14 +43,15 @@ export default function Home() {
             </Link>
             <div className="flex items-center gap-6">
               <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-                Products
+                {t('products')}
               </Link>
               <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
-                About
+                {t('about')}
               </Link>
               <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
-                Contact
+                {t('contact')}
               </Link>
+              <LanguageSwitcher />
               <button className="relative p-2 hover:bg-muted rounded-lg transition-colors">
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
@@ -65,24 +70,23 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Advanced Commerce Solutions
+              {t('heroTitle')}
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              PayCo provides advanced, technology-based commerce solutions for all types of businesses. 
-              Discover our cutting-edge hardware products designed to power your success.
+              {t('heroDescription')}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <a 
                 href="#products" 
                 className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg"
               >
-                Shop Now
+                {t('shopNow')}
               </a>
               <a 
                 href="#features" 
                 className="px-8 py-3 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-secondary/90 transition-colors"
               >
-                Learn More
+                {t('learnMore')}
               </a>
             </div>
           </div>
@@ -97,27 +101,27 @@ export default function Home() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Zap className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Fast & Reliable</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('fastReliable')}</h3>
               <p className="text-muted-foreground">
-                Industry-leading performance and reliability for your business operations
+                {t('fastReliableDesc')}
               </p>
             </div>
             <div className="text-center p-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Payments</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('securePayments')}</h3>
               <p className="text-muted-foreground">
-                Bank-level security with end-to-end encryption for all transactions
+                {t('securePaymentsDesc')}
               </p>
             </div>
             <div className="text-center p-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <Package className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Quality Hardware</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('qualityHardware')}</h3>
               <p className="text-muted-foreground">
-                Premium hardware designed and tested for demanding business environments
+                {t('qualityHardwareDesc')}
               </p>
             </div>
           </div>
@@ -128,9 +132,9 @@ export default function Home() {
       <section id="products" className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Our Products</h2>
+            <h2 className="text-4xl font-bold mb-4">{t('ourProducts')}</h2>
             <p className="text-xl text-muted-foreground">
-              Explore our range of professional hardware solutions
+              {t('exploreProducts')}
             </p>
           </div>
 
@@ -148,7 +152,7 @@ export default function Home() {
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">No products available at the moment.</p>
+              <p className="text-muted-foreground text-lg">{t('noProducts')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -202,10 +206,10 @@ export default function Home() {
           <div className="text-center text-muted-foreground">
             <p className="mb-2 font-semibold text-foreground">PayCo</p>
             <p className="text-sm">
-              Advanced, technology-based commerce solutions for all types of businesses
+              {t('footerTagline')}
             </p>
             <p className="text-sm mt-4">
-              © {new Date().getFullYear()} PayCo. All rights reserved.
+              © {new Date().getFullYear()} PayCo. {t('allRightsReserved')}
             </p>
           </div>
         </div>
