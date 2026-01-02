@@ -168,7 +168,7 @@ export default function Home() {
                     href={`/product/${product.sys.id}`}
                     className="group border border-border rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 bg-card"
                   >
-                    <div className="relative h-48 bg-muted overflow-hidden">
+                    <div className="relative w-full bg-muted overflow-hidden" style={{ height: '192px' }}>
                       {imageUrl ? (
                         <Image
                           src={`https:${imageUrl}`}
