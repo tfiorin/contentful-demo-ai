@@ -80,11 +80,32 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20">
-        <div className="container mx-auto px-4">
+      <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20 relative overflow-hidden">
+        {/* Hero Banner Image as Background */}
+        {landingPage?.fields?.heroBannerImage?.fields?.file?.url && (
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={`https:${landingPage.fields.heroBannerImage.fields.file.url}`}
+              alt="Hero Banner"
+              fill
+              className="object-cover opacity-20"
+              priority
+            />
+          </div>
+        )}
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              {t('heroTitle')}
+            <h1 
+              className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              style={landingPage?.fields?.heroBannerHeadlineColor ? { 
+                background: landingPage.fields.heroBannerHeadlineColor,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              } : {}}
+            >
+              {landingPage?.fields?.heroBannerHeadline || t('heroTitle')}
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
               {t('heroDescription')}
