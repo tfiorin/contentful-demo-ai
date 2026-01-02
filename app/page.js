@@ -10,6 +10,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  const [landingPage, setLandingPage] = useState(null);
   const [loading, setLoading] = useState(true);
   const { cart } = useCart();
   const { locale, t } = useLanguage();
@@ -28,6 +29,19 @@ export default function Home() {
       }
     }
     loadProducts();
+  }, [locale]);
+
+  useEffect(() => {
+    async function loadLandingPage() {
+      try {
+        const response = await fetch(`/api/landing?locale=${locale}`);
+        const data = await response.json();
+        setLandingPage(data.landingPage);
+      } catch (error) {
+        console.error('Error loading landing page:', error);
+      }
+    }
+    loadLandingPage();
   }, [locale]);
 
   const itemCount = cart?.lines?.edges?.length || 0;
