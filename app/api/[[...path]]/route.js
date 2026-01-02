@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchProducts, fetchProductById } from '@/lib/contentful';
+import { fetchProducts, fetchProductBySlug } from '@/lib/contentful';
 import { getShopifyClient } from '@/lib/shopify';
 import { QUERY_PRODUCT_BY_SKU } from '@/lib/shopify/queries';
 import { CREATE_CART, ADD_TO_CART } from '@/lib/shopify/mutations';
@@ -23,10 +23,10 @@ export async function GET(request) {
       return NextResponse.json({ products });
     }
 
-    // GET /api/products/:id - Fetch single product from Contentful
+    // GET /api/products/:slug - Fetch single product by slug from Contentful
     if (segments[0] === 'products' && segments.length === 2) {
-      const productId = segments[1];
-      const product = await fetchProductById(productId, locale);
+      const slug = segments[1];
+      const product = await fetchProductBySlug(slug, locale);
       
       if (!product) {
         return NextResponse.json(
