@@ -1,17 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart, Package, Minus, Plus, Check, AlertCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { ContentfulLivePreviewProvider } from '@contentful/live-preview/react';
 
-export default function ProductDetailPage() {
+function ProductDetailContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const { addToCart, checkout } = useCart();
   const { locale, t } = useLanguage();
+  const isPreview = searchParams.get('preview') === '1';
   
   const [product, setProduct] = useState(null);
   const [inventory, setInventory] = useState(null);
@@ -28,7 +31,7 @@ export default function ProductDetailPage() {
         setError(null);
         
         // Fetch product from Contentful with locale using slug
-        const productResponse = await fetch(`/api/products/${params.slug}?locale=${locale}`);
+        const productResponse = await fetch(`/api/products/${params.slug}?locale=${locale}&preview=${isPreview ? '1' : '0'}`);
         if (!productResponse.ok) {
           throw new Error('Product not found');
         }
@@ -77,7 +80,7 @@ export default function ProductDetailPage() {
     if (params.slug) {
       loadProduct();
     }
-  }, [params.slug, locale]);
+  }, [params.slug, locale, isPreview]);
 
   const handleAddToCart = async () => {
     if (!inventory?.variantId) {
@@ -351,5 +354,20 @@ export default function ProductDetailPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function ProductDetailPage() {
+  const searchParams = useSearchParams();
+  const isPreview = searchParams.get('preview') === '1';
+
+  return (
+    <ContentfulLivePreviewProvider
+      locale="en-US"
+      enableInspectorMode={isPreview}
+      enableLiveUpdates={isPreview}
+    >
+      <ProductDetailContent />
+    </ContentfulLivePreviewProvider>
   );
 }
