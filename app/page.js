@@ -8,6 +8,7 @@ import { ShoppingCart, Package, Shield, Zap } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import Hero from '@/components/Hero';
 import {
   ContentfulLivePreviewProvider,
   useContentfulInspectorMode,
@@ -112,42 +113,10 @@ function HomeContent({ isPreview }) {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        {landingPage?.fields?.heroBannerImage?.fields?.file?.url && (
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={`https:${landingPage.fields.heroBannerImage.fields.file.url}`}
-              alt="Hero Banner"
-              fill
-              className="object-cover opacity-20"
-              priority
-            />
-          </div>
-        )}
-
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-4xl">
-          <h1
-            {...inspector({ fieldId: 'heroBannerHeadline' })}
-            className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent"
-            style={
-              landingPage?.fields?.heroBannerHeadlineColor
-                ? {
-                    background: landingPage.fields.heroBannerHeadlineColor,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }
-                : undefined
-            }
-          >
-            {landingPage?.fields?.heroBannerHeadline}
-          </h1>
-
-          <p className="text-xl text-muted-foreground mb-8">
-            {t('heroDescription')}
-          </p>
-        </div>
-      </section>
+      {/* Hero Section - Now using Hero Component */}
+      {landingPage?.fields?.hero && (
+        <Hero hero={landingPage.fields.hero} isPreview={isPreview} />
+      )}
 
       {/* Features */}
       <section id="features" className="py-16 bg-muted/30">
@@ -155,16 +124,16 @@ function HomeContent({ isPreview }) {
           <div className="text-center p-6">
             <Zap className="w-8 h-8 mx-auto text-primary mb-4" />
             <h3
-              {...inspector({ fieldId: 'leftFeature', target: 'fields.title' })}
+              {...(isPreview ? inspector({ fieldId: 'leftFeature', target: 'fields.title' }) : {})}
               className="text-xl font-semibold mb-2"
             >
               {landingPage?.fields?.leftFeature?.fields?.title}
             </h3>
             <p
-              {...inspector({
+              {...(isPreview ? inspector({
                 fieldId: 'leftFeature',
                 target: 'fields.description',
-              })}
+              }) : {})}
               className="text-muted-foreground"
             >
               {landingPage?.fields?.leftFeature?.fields?.description}
@@ -174,19 +143,19 @@ function HomeContent({ isPreview }) {
           <div className="text-center p-6">
             <Shield className="w-8 h-8 mx-auto text-primary mb-4" />
             <h3
-              {...inspector({
+              {...(isPreview ? inspector({
                 fieldId: 'middleFeature',
                 target: 'fields.title',
-              })}
+              }) : {})}
               className="text-xl font-semibold mb-2"
             >
               {landingPage?.fields?.middleFeature?.fields?.title}
             </h3>
             <p
-              {...inspector({
+              {...(isPreview ? inspector({
                 fieldId: 'middleFeature',
                 target: 'fields.description',
-              })}
+              }) : {})}
               className="text-muted-foreground"
             >
               {landingPage?.fields?.middleFeature?.fields?.description}
@@ -196,19 +165,19 @@ function HomeContent({ isPreview }) {
           <div className="text-center p-6">
             <Package className="w-8 h-8 mx-auto text-primary mb-4" />
             <h3
-              {...inspector({
+              {...(isPreview ? inspector({
                 fieldId: 'rightFeature',
                 target: 'fields.title',
-              })}
+              }) : {})}
               className="text-xl font-semibold mb-2"
             >
               {landingPage?.fields?.rightFeature?.fields?.title}
             </h3>
             <p
-              {...inspector({
+              {...(isPreview ? inspector({
                 fieldId: 'rightFeature',
                 target: 'fields.description',
-              })}
+              }) : {})}
               className="text-muted-foreground"
             >
               {landingPage?.fields?.rightFeature?.fields?.description}
