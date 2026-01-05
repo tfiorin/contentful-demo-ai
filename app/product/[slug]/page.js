@@ -239,11 +239,11 @@ function ProductDetailContent() {
                 </div>
               )}
 
-              {displaySku && (
+              {/* {displaySku && (
                 <div className="mb-4">
                   <p className="text-sm text-muted-foreground">SKU: {displaySku}</p>
                 </div>
-              )}
+              )} */}
 
               {/* Availability */}
               <div className="mb-6 p-4 rounded-lg bg-muted/50">
